@@ -599,36 +599,84 @@
          * @param listName
          */
         $scope.addMembers = function (listName) {
-            $scope.listName = listName;
-            if (_.isEmpty($scope.manageMembers)) {
-                $scope.emptyInput = true;
-            } else {
-                let numMembers = ($scope.manageMembers.split(" ").length - 1);
-                if (numMembers > 0) {
-                    let users = $scope.manageMembers.split(/[ ,]+/).join(",");
-                    $scope.manageMembers = [];
-                    if (numMembers > $scope.maxImport) {
-                        $scope.launchDynamicModal(
-                            Message.Title.IMPORT_OUT_OF_BOUNDS,
-                            `Importing more than ${$scope.maxImport} users is not allowed.`,
-                            8000);
-                    } else {
-                        if (numMembers > $scope.multiAddThreshold) {
-                            $scope.launchDynamicModal(
-                                Message.Title.LARGE_IMPORT,
-                                `You are attempting to import ${numMembers} new users to the ${listName} list.
+
+
+
+
+          $scope.listName = listName;
+
+          /* Creates a regular expression that looks for a pattern, checking to see if a user typed in anything
+          other than a lowercase character, number from 0-9, or character other than an @, _ or - ; also checks to see
+          if user entered in a username less than or equal to 64 characters.
+           */
+
+
+
+          var array = $scope.manageMembers.split(' ');
+
+          const re = new RegExp(/[a-z0-9@_-]/g);
+
+          /* tests to make sure that conversion from string into array works.
+
+          console.log(array);
+
+          console.log(array.length);
+
+
+           */
+
+          for (let i = 0; i < array.length; i++) {
+            /* tests to make sure that the characters in the regular expression match the characters in the array.
+            console.log(array[i].match(re).length);
+            console.log(array[i].length);
+
+
+             */
+
+            // function that throws an exception if the amount of characters in the regular expression is not equal to the length of characters in each element in the array.
+            if ((array[i].match(re).length) != array[i].length) {
+              $scope.createAddErrorModal();
+              return;
+            }
+
+
+            if ((array[i].length > 64 || array[i].length < 3)) {
+              $scope.createAddErrorModal();
+              return;
+            }
+          }
+
+
+          if (_.isEmpty($scope.manageMembers)) {
+            $scope.emptyInput = true;
+          } else {
+            let numMembers = ($scope.manageMembers.split(" ").length - 1);
+            if (numMembers > 0) {
+              let users = $scope.manageMembers.split(/[ ,]+/).join(",");
+              $scope.manageMembers = [];
+              if (numMembers > $scope.maxImport) {
+                $scope.launchDynamicModal(
+                    Message.Title.IMPORT_OUT_OF_BOUNDS,
+                    `Importing more than ${$scope.maxImport} users is not allowed.`,
+                    8000);
+              } else {
+                if (numMembers > $scope.multiAddThreshold) {
+                  $scope.launchDynamicModal(
+                      Message.Title.LARGE_IMPORT,
+                      `You are attempting to import ${numMembers} new users to the ${listName} list.
                              Imports larger than ${$scope.multiAddThreshold} can take a few minutes.  An email with
                              the import results will be sent.`,
-                                8000);
-                        }
-                        $scope.addMultipleMembers(users, listName);
-                    }
-                } else {
-                    $scope.userToAdd = $scope.manageMembers;
-                    $scope.validateAndAddUser($scope.userToAdd, listName);
+                      8000);
                 }
+                $scope.addMultipleMembers(users, listName);
+              }
+            } else {
+              $scope.userToAdd = $scope.manageMembers;
+              $scope.validateAndAddUser($scope.userToAdd, listName);
             }
+          }
         };
+
 
         // Checks that a users name matches the pattern of either a valid uid or a uhUuid
         $scope.sanitizer = (name) => {
@@ -1092,6 +1140,41 @@
          * Give a user or multiple users ownership of a grouping.
          */
         $scope.addOwners = function () {
+          var array = $scope.manageOwners.split(' ');
+
+          const re = new RegExp(/[a-z0-9@_-]/g);
+
+          /* tests to make sure that conversion from string into array works.
+
+          console.log(array);
+
+          console.log(array.length);
+
+
+           */
+
+          for (let i = 0; i < array.length; i++) {
+            /* tests to make sure that the characters in the regular expression match the characters in the array.
+            console.log(array[i].match(re).length);
+            console.log(array[i].length);
+
+
+
+
+             */
+
+            // function that throws an exception if the amount of characters in the regular expression is not equal to the length of characters in each element in the array.
+            if ((array[i].match(re).length) != array[i].length) {
+              $scope.createAddErrorModal();
+              return;
+            }
+
+
+            if ((array[i].length > 64 || array[i].length < 3)) {
+              $scope.createAddErrorModal();
+              return;
+            }
+          }
             const manageOwners = $scope.manageOwners;
             const list = "owners";
             $scope.userToAdd = manageOwners;
@@ -1110,6 +1193,7 @@
                              the import results will be sent.`,
                             8000);
                     }
+
                     $scope.addMultipleMembers(users, list);
                 } else {
                     $scope.userToAdd = manageOwners;
@@ -1283,46 +1367,121 @@
          * @param currentPage - The page that you are currently on.
          */
         $scope.prepBatchRemove = function (listName, currentPage) {
-            if (!_.isEmpty($scope.membersInCheckboxList)) {
-                $scope.membersToModify = $scope.extractSelectedUsersFromCheckboxes($scope.membersInCheckboxList);
-                $scope.membersInCheckboxList = {};
+
+          var array = $scope.manageMembers.split(' ');
+
+          const re = new RegExp(/[a-z0-9@_-]/g);
+
+          /* tests to make sure that conversion from string into array works.
+
+          console.log(array);
+
+          console.log(array.length);
+
+
+           */
+
+          for (let i = 0; i < array.length; i++) {
+            /* tests to make sure that the characters in the regular expression match the characters in the array.
+            console.log(array[i].match(re).length);
+            console.log(array[i].length);
+
+
+             */
+
+            // function that throws an exception if the amount of characters in the regular expression is not equal to the length of characters in each element in the array.
+            if ((array[i].match(re).length) != array[i].length) {
+              $scope.createRemoveErrorModal("the user(s) typed in");
+              return;
             }
-            if (!_.isEmpty($scope.manageMembers)) {
-                $scope.membersToModify = $scope.manageMembers;
+
+
+            if ((array[i].length > 64)) {
+              $scope.createRemoveErrorModal("the user(s) typed in");
+              return;
             }
-            if (!_.isEmpty(($scope.manageOwners))) {
-                $scope.membersToModify = $scope.manageOwners;
-            }
-            if (_.isEmpty($scope.membersToModify)) {
-                $scope.emptyInput = true;
+          }
+
+          const arrString = array.join(" ");
+
+          console.log(arrString);
+
+          if (!_.isEmpty($scope.membersInCheckboxList)) {
+            $scope.membersToModify = $scope.extractSelectedUsersFromCheckboxes($scope.membersInCheckboxList);
+            $scope.membersInCheckboxList = {};
+          }
+          if (!_.isEmpty($scope.manageMembers)) {
+            $scope.membersToModify = $scope.manageMembers;
+          }
+          if (!_.isEmpty(($scope.manageOwners))) {
+            $scope.membersToModify = $scope.manageOwners;
+          }
+          if (_.isEmpty($scope.membersToModify)) {
+            $scope.emptyInput = true;
+          } else {
+            $scope.listName = listName;
+            $scope.currentPage = currentPage;
+            let membersToRemove = $scope.parseAddRemoveInputStr($scope.membersToModify);
+            const memberId = membersToRemove.uhUuid;
+            console.log(membersToRemove);
+            let numMembersToRemove = membersToRemove.split(",").length;
+            $scope.membersToModify = [];
+            if (numMembersToRemove > 1) {
+              membersToRemove = $scope.parseAddRemoveInputStr(membersToRemove);
+              removeMembers(membersToRemove, listName);
             } else {
-                $scope.listName = listName;
-                $scope.currentPage = currentPage;
-                let membersToRemove = $scope.parseAddRemoveInputStr($scope.membersToModify);
-                let numMembersToRemove = membersToRemove.split(",").length;
-                $scope.membersToModify = [];
-                if (numMembersToRemove > 1) {
-                    membersToRemove = $scope.parseAddRemoveInputStr(membersToRemove);
-                    removeMembers(membersToRemove, listName);
-                } else {
-                    if (membersToRemove === "") {
-                        $scope.memberToRemove = $scope.membersToAddOrRemove;
-                    } else {
-                        $scope.memberToRemove = membersToRemove;
-                    }
-                    $scope.memberToRemove = returnMemberObjectFromUserIdentifier($scope.memberToRemove, currentPage);
-                    if (listName === "owners" && $scope.groupingOwners.length === 1) {
-                        const userType = "owner";
-                        $scope.createRemoveErrorModal(userType);
-                    } else {
-                        $scope.createRemoveModal({
-                            user: $scope.memberToRemove,
-                            listName: listName,
-                            scope: $scope
-                        });
-                    }
+              if (membersToRemove === "") {
+                $scope.memberToRemove = $scope.membersToAddOrRemove;
+              } else {
+                $scope.memberToRemove = membersToRemove;
+              }
+              $scope.memberToRemove = returnMemberObjectFromUserIdentifier($scope.memberToRemove, currentPage);
+
+              let membersArr = membersToRemove.split('');
+
+              console.log(membersArr[2]);
+              /*
+              for (let i = 0; i < membersArr.length; i++) {
+                let temp = membersArr[i];
+                if (temp.toUpperCase() === temp) {
+                  console.log("you can't do that ")
+                  $scope.createRemoveErrorModal(membersToRemove);
+                  return;
                 }
+              }
+
+               */
+
+
+              /*
+              const re = new RegExp(/^[a-zA-Z0-9_]\s*$);
+             */
+
+
+
+
+              if (!$scope.memberToRemove) {
+                $scope.createRemoveErrorModal(membersToRemove);
+                return;
+              }
+
+
+
+
+
+
+              if (listName === "owners" && $scope.groupingOwners.length === 1) {
+                const userType = "owner";
+                $scope.createRemoveErrorModal(userType);
+              } else {
+                $scope.createRemoveModal({
+                  user: $scope.memberToRemove,
+                  listName: listName,
+                  scope: $scope
+                });
+              }
             }
+          }
         };
 
         /**
